@@ -1,0 +1,14 @@
+{
+  "name": "gregoria",
+  "version": "1.0.0",
+  "description": "An object that represents a named time period in the Gregorian calendar.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^2.5.2"
+  }
+}
