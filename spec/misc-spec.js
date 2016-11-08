@@ -1,65 +1,75 @@
 var Era = require("../index");
 
-describe("decade era for 1990s", function() {
+function _validate(data) {
 
-  var era = new Era("1990s");
+  describe("'"+data.slug+"'", function() {
 
-  it("has a proper title", function() {
-    expect(era.title).toEqual("1990s");
+    var era = new Era(data.slug);
+
+    it("is recognized as a '"+data.type+"' era", function() {
+      expect(era.type).toEqual(data.type);
+    });
+
+    it("has a proper title '"+data.title+"'", function() {
+      expect(era.title).toEqual(data.title);
+    });
+
+    if (data.previousSlug) {
+      it("previous is '"+data.previousSlug+"'", function() {
+        expect(era.previous.slug).toEqual(data.previousSlug);
+      });
+    }
+
+    if (data.nextSlug) {
+      it("next is '"+data.nextSlug+"'", function() {
+        expect(era.next.slug).toEqual(data.nextSlug);
+      });
+    }
+
   });
 
-  it("previous is 1980s", function() {
-    expect(era.previous.slug).toEqual("1980s");
-  });
+}
 
-  it("next is 2000s", function() {
-    expect(era.next.slug).toEqual("2000s");
-  });
-
+_validate({
+    type: "decade",
+    slug: "1990s",
+    title: "1990s",
+    previousSlug: "1980s",
+    nextSlug: "2000s"
 });
 
-describe("year era for 1990", function() {
-
-  var era = new Era("1991");
-
-  it("has a proper title", function() {
-    expect(era.title).toEqual("1991");
-  });
-
-  it("previous is 1990", function() {
-    expect(era.previous.slug).toEqual(1990);
-  });
-
-  it("next is 1992", function() {
-    expect(era.next.slug).toEqual(1992);
-  });
-
+_validate({
+    type: "year",
+    slug: "1991",
+    title: "1991",
+    previousSlug: "1990",
+    nextSlug: "1992"
 });
 
-describe("month era for December 1990", function() {
-
-  var era = new Era("1990-12");
-
-  it("has a proper title", function() {
-    expect(era.title).toEqual("December 1990");
-  });
-
-  it("points to next month January 1991", function() {
-    expect(era.next.slug).toEqual("1991-01");
-  });
-
+_validate({
+    type: "month",
+    slug: "1990-12",
+    title: "December 1990",
+    previousSlug: "1990-11",
+    nextSlug: "1991-01"
 });
 
-describe("month era for January 1991", function() {
+_validate({
+    type: "month",
+    slug: "1991-01",
+    title: "January 1991",
+    previousSlug: "1990-12",
+    nextSlug: "1991-02"
+});
 
-  var era = new Era("1991-01");
+_validate({
+    type: "week",
+    slug: "1991-01-w1",
+    title: "January 1991 week 1"
+});
 
-  it("has a proper title", function() {
-    expect(era.title).toEqual("January 1991");
-  });
-
-  it("points to previous month December 1990", function() {
-    expect(era.previous.slug).toEqual("1990-12");
-  });
-
+_validate({
+    type: "day",
+    slug: "1991-01-01",
+    title: "January 1, 1991"
 });

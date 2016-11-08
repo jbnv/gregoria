@@ -7,6 +7,14 @@ const _monthNames = [
   "July","August","September","October","November","December"
 ];
 
+const patterns = {
+  decade: /^\d\d\d0s$/,
+  year:   /^\d\d\d\d$/,
+  month:  /^\d\d\d\d-\d\d$/,
+  week:   /^\d\d\d\d-\d\d-w\d$/,
+  day:    /^\d\d\d\d-\d\d-\d\d$/,
+}
+
 function _monthSlug(year,month) {
   return ""+year+"-"+(month < 10 ? "0" : "")+month;
 }
@@ -22,20 +30,63 @@ function _yearTitle(slug) {
   return ""+slug;
 }
 
-function _monthTitle(slug,month) {
-  if (!slug) return null;
-  if (/^\d\d\d\d-\d\d$/.test(slug) && !month) {
-    numbers = slug.match(/\d+/g);
-    year = parseInt(numbers[0]);
-    month = parseInt(numbers[1]);
-  } else {
-    year = slug;
+function _monthTitle() {
+
+  if (arguments.length == 0) return null;
+
+  var year = arguments[0];
+  var month = arguments[1];
+
+  if (arguments.length == 1) {
+    if (!patterns.month.test(arguments[0])) return null;
+    numbers = arguments[0].match(/\d+/g);
+    year = numbers[0];
+    month = numbers[1];
   }
-  return _monthNames[month-1]+" "+year;
+
+  return _monthNames[parseInt(month)-1]+" "+year;
+}
+
+function _weekTitle() {
+
+  if (arguments.length == 0) return null;
+
+  var year = arguments[0];
+  var month = arguments[1];
+  var week = arguments[2];
+
+  if (arguments.length == 1) {
+    if (!patterns.week.test(arguments[0])) return null;
+    numbers = arguments[0].match(/\d+/g);
+    year = numbers[0];
+    month = numbers[1];
+    week = numbers[2];
+  }
+
+  return _monthNames[parseInt(month)-1]+" "+year+" week "+week;
+}
+
+function _dayTitle() {
+
+  if (arguments.length == 0) return null;
+
+  var year = arguments[0];
+  var month = arguments[1];
+  var day = arguments[2];
+
+  if (arguments.length == 1) {
+    if (!patterns.day.test(arguments[0])) return null;
+    numbers = arguments[0].match(/\d+/g);
+    year = numbers[0];
+    month = numbers[1];
+    day = numbers[2];
+  }
+
+  return _monthNames[parseInt(month)-1]+" "+parseInt(day)+", "+year;
 }
 
 function _entity(slug,titleFn) {
-  return { slug: slug, title: titleFn(slug) };
+  return { slug: ""+slug, title: titleFn(""+slug) };
 }
 
 module.exports =  function(pDefaultSlug,options) {
@@ -45,9 +96,9 @@ module.exports =  function(pDefaultSlug,options) {
 	this.fromSlug = function(slug) {
 
 		this.slug = slug;
-		this.title = slug;
+		this.title = ""+slug; // force string
 
-		if (/^\d\d\d0s$/.test(slug)) {
+		if (patterns.decade.test(slug)) {
 
 			this.type = "decade";
 			decade = parseInt(slug.match(/\d\d\d0/)[0]);
@@ -58,7 +109,7 @@ module.exports =  function(pDefaultSlug,options) {
 			this.previous = _entity(""+(decade-10)+"s",_decadeTitle);
 			this.next = _entity(""+(decade+10)+"s",_decadeTitle);
 
-		} else if (/^\d\d\d\d$/.test(slug)) {
+		} else if (patterns.year.test(slug)) {
 
 			this.type = "year";
       year = parseInt(slug);
@@ -70,13 +121,13 @@ module.exports =  function(pDefaultSlug,options) {
 			this.previous = _entity(year-1,_yearTitle);
 			this.next = _entity(year+1,_yearTitle);
 
-		} else if (/^\d\d\d\d-\d\d$/.test(slug)) {
+		} else if (patterns.month.test(slug)) {
 
 			this.type = "month";
 			numbers = slug.match(/\d+/g);
       year = parseInt(numbers[0]);
 			month = parseInt(numbers[1]);
-			this.title = _monthTitle(year,month);
+			this.title = _monthTitle(slug);
       this.decade = year - (year%10);
 			this.year = year;
 			this.month = month;
@@ -84,6 +135,40 @@ module.exports =  function(pDefaultSlug,options) {
 			next = month == 12 ? _monthSlug(year+1,1) : _monthSlug(year,month+1);
 			this.previous = _entity(previous,_monthTitle);
 			this.next = _entity(next,_monthTitle);
+
+    } else if (patterns.week.test(slug)) {
+
+			this.type = "week";
+			numbers = slug.match(/\d+/g);
+      year = parseInt(numbers[0]);
+			month = parseInt(numbers[1]);
+      week = parseInt(numbers[2]);
+			this.title = _weekTitle(slug);
+      this.decade = year - (year%10);
+			this.year = year;
+			this.month = month;
+      this.week = week;
+			// previous = month == 1 ? _monthSlug(year-1,12) : _monthSlug(year,month-1);
+			// next = month == 12 ? _monthSlug(year+1,1) : _monthSlug(year,month+1);
+			// this.previous = _entity(previous,_monthTitle);
+			// this.next = _entity(next,_monthTitle);
+
+    } else if (patterns.day.test(slug)) {
+
+			this.type = "day";
+			numbers = slug.match(/\d+/g);
+      year = parseInt(numbers[0]);
+			month = parseInt(numbers[1]);
+      day = parseInt(numbers[2]);
+			this.title = _dayTitle(slug);
+      this.decade = year - (year%10);
+			this.year = year;
+			this.month = month;
+      this.day = day;
+			// previous = month == 1 ? _monthSlug(year-1,12) : _monthSlug(year,month-1);
+			// next = month == 12 ? _monthSlug(year+1,1) : _monthSlug(year,month+1);
+			// this.previous = _entity(previous,_monthTitle);
+			// this.next = _entity(next,_monthTitle);
 
 		}
 	}
@@ -101,7 +186,9 @@ module.exports =  function(pDefaultSlug,options) {
 			type:this.type,
 			decade:this.decade || null,
 			year:this.year || null,
-			month:this.month || null
+			month:this.month || null,
+      week:this.week || null,
+			day:this.day || null
 		};
 	};
 
