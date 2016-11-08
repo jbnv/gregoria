@@ -26,6 +26,12 @@ function _validate(data) {
       });
     }
 
+    if (data.children) {
+      it("children", function() {
+        expect(era.children).toEqual(data.children);
+      });
+    }
+
   });
 
 }
@@ -35,7 +41,11 @@ _validate({
     slug: "1990s",
     title: "1990s",
     previousSlug: "1980s",
-    nextSlug: "2000s"
+    nextSlug: "2000s",
+    children: [
+      "1990","1991","1992","1993","1994",
+      "1995","1996","1997","1998","1999"
+    ]
 });
 
 _validate({
@@ -43,7 +53,13 @@ _validate({
     slug: "1991",
     title: "1991",
     previousSlug: "1990",
-    nextSlug: "1992"
+    nextSlug: "1992",
+    children: [
+      "1991-01","1991-02","1991-03",
+      "1991-04","1991-05","1991-06",
+      "1991-07","1991-08","1991-09",
+      "1991-10","1991-11","1991-12"
+    ]
 });
 
 _validate({

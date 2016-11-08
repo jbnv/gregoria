@@ -103,8 +103,8 @@ module.exports =  function(pDefaultSlug,options) {
 			this.type = "decade";
 			decade = parseInt(slug.match(/\d\d\d0/)[0]);
 			this.decade = decade;
-			this.years = _digits.map(function(d) {
-				return decade+d;
+			this.children = _digits.map(function(d) {
+				return ""+(decade+d);
 			});
 			this.previous = _entity(""+(decade-10)+"s",_decadeTitle);
 			this.next = _entity(""+(decade+10)+"s",_decadeTitle);
@@ -115,7 +115,7 @@ module.exports =  function(pDefaultSlug,options) {
       year = parseInt(slug);
       this.decade = year - (year%10);
 			this.year = year;
-			this.months = _monthSlugs.map(function(s) {
+			this.children = _monthSlugs.map(function(s) {
 				return ""+year+"-"+s;
 			});
 			this.previous = _entity(year-1,_yearTitle);
