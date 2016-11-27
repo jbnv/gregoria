@@ -26,6 +26,23 @@ function _validate(data) {
       });
     }
 
+    function _checkField(slug) {
+      if (data[slug]) {
+        it(slug+" is '"+data[slug]+"'", function() {
+          expect(era[slug]).toEqual(data[slug]);
+        });
+      } else if (data[slug] === null) {
+        it(slug+" is falsy", function() {
+          expect(era[slug]).toBeFalsy();
+        });
+      }
+    }
+
+    _checkField("decade");
+    _checkField("year");
+    _checkField("month");
+    _checkField("day");
+
     if (data.children) {
       it("children", function() {
         expect(era.children).toEqual(data.children);
@@ -40,6 +57,10 @@ _validate({
     type: "decade",
     slug: "1990s",
     title: "1990s",
+    decade: 1990,
+    year: null,
+    month: null,
+    day: null,
     previousSlug: "1980s",
     nextSlug: "2000s",
     children: [
@@ -52,6 +73,10 @@ _validate({
     type: "year",
     slug: "1991",
     title: "1991",
+    decade: 1990,
+    year: 1991,
+    month: null,
+    day: null,
     previousSlug: "1990",
     nextSlug: "1992",
     children: [
@@ -87,5 +112,9 @@ _validate({
 _validate({
     type: "day",
     slug: "1991-01-01",
+    decade: 1990,
+    year: 1991,
+    month: 1,
+    day: 1,
     title: "January 1, 1991"
 });
